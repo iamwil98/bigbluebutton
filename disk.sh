@@ -27,9 +27,4 @@ echo "UUID=$uuid   /datadrive   ext4   defaults,nofail   1   2" >> /etc/fstab
 
 echo "El disco ha sido formateado con ext4, montado en /datadrive y configurado para el montaje automático en el arranque a través de fstab."
 
-#comando 
-#az vm run-command invoke -g BIGBLUEBUTTON-SENA -n sena-bbbtest-00 --command-id RunShellScript --scripts "sudo touch /home/azureuser/testo.txt"
-az vm run-command invoke -g BIGBLUEBUTTON-SENA -n sena-bbbtest-00 --command-id RunShellScript --scripts "sudo chmod 777 /home/azureuser/testo.txt"
-az vm run-command invoke -g BIGBLUEBUTTON-SENA -n sena-bbbtest-00 --command-id RunShellScript --scripts "sudo sh /home/azureuser/texto.txt"
-
 
