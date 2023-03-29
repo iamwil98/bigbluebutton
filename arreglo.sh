@@ -1,48 +1,6 @@
-#!/bin/bash
-echo "Realizando update"
-sudo apt-get update -y
-echo "Realizando Upgrade"
-sudo apt-get upgrade -y
-
-#Variable de Hostname Para instalacion de Bigbluebutton, el nombre de la maquina debe concordar con el dns aplicado a la instancia minisculas.
-
-hostname="`hostname`.eastus.cloudapp.azure.com"
-
-wget -qO- https://ubuntu.bigbluebutton.org/bbb-install-2.5.sh | bash -s -- -v focal-250 -s $hostname -e wilmar.aguilar@territorio.com  -a -w
-
-#Modificando TLS en el VIRTUALHOST de Nginx
-
-sed -i "s/ssl_protocols TLSv1.2 TLSv1.3/ssl_protocols TLSv1.2/g" /etc/nginx/sites-available/bigbluebutton
-echo "iniciando Servicio Nginx"
-
-/etc/init.d/nginx start
-echo "###Reiniciar BBB"
-
-bbb-conf --restart
-
-###################Opciones PRESENTACION E IDIOMA####
-##Cambiar la presentation
-cp /home/azureuser/bigbluebutton/default.pdf /var/www/bigbluebutton-default/default.pdf
 
 
 
-sed -i "s/Welcome to/Bienvenido a/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties 
-#For help on using BigBlueButton see these
-sed -i "s/For help on using BigBlueButton see these/Para obtener ayuda sobre el uso de BigBlueButton, puede consultar/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-#To join the audio bridge click the speaker button
-sed -i "s/To join the audio bridge click the speaker button/Para unirse al puente de audio, haga clic en el bot&oacute;n del altavoz/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.p
-#Use a headset to avoid causing background noise for others
-sed -i "s/Use a headset to avoid causing background noise for others/Use un auricular para evitar causar ruido de fondo a los dem&aacute;s/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebu>
-#This server is running
-sed -i "s/This server is running/Este servidor esta activo/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-
-#########################################
-## CAMBIA PARAMETROS DEL VIDEO RB
-cp /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb.old
-cp /home/azureuser/bigbluebutton/video.rb   /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb
-#####
-
-####CAMBIANDO BBB-PROPERTIES  SETTINGS
 
 sed -i "s/Welcome to/Bienvenido a/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties 
 #For help on using BigBlueButton see these
@@ -97,7 +55,7 @@ chmod 777 /home/azureuser/scalelite_batch_import.sh
 apt-get install nfs-common -y
 
 mkdir -p /mnt/scalelite-recordings
-echo "10.9.2.27:/mnt/scalelite-recordings     /mnt/scalelite-recordings        nfs     auto,nofail,noatime,nolock,intr,tcp,actimeo=1800        0       0" >> /etc/fstab
+#echo "10.2.35.5:/mnt/scalelite-recordings     /mnt/scalelite-recordings        nfs     auto,nofail,noatime,nolock,intr,tcp,actimeo=1800        0       0" >> /etc/fstab
 mount -a
 
 
@@ -137,8 +95,4 @@ gem install redis builder nokogiri loofah open4 absolute_time journald-logger -y
 gem update --default -y
 gem update fileutils --default 
 
-
-
-mv /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec.old
-gem uninstall reline -v 0.1.2
 apt-get purge bbb-demo -y
