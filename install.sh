@@ -82,7 +82,7 @@ mkdir -p /mnt/scalelite-recordings
 echo "10.9.2.27:/mnt/scalelite-recordings     /mnt/scalelite-recordings        nfs     auto,nofail,noatime,nolock,intr,tcp,actimeo=1800        0       0" >> /etc/fstab
 mount -a
 
-/var/lib/tomcat9/logs
+mkdir -p /var/lib/tomcat9/logs
 ####EN CASO DE MIGRAR DATADRIVE
 #MONTAR EL DISCO EN /datadrive/bigbluebutton
 cp -r /var/bigbluebutton /var/bigbluebutton2
@@ -111,6 +111,7 @@ echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/r
 
 #mv /usr/local/bigbluebutton/core/Gemfile.lock  /usr/local/bigbluebutton/core/Gemfile.lock.old
 #addgroup scalelite-spool
+#adduser bigbluebutton
 #rm a esrte archivo Gemfile.lock.old
 #bbb-conf --clean
 #sudo gem install conection_pool
