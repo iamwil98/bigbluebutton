@@ -24,24 +24,6 @@ bbb-conf --restart
 ##Cambiar la presentation
 cp /home/azureuser/bigbluebutton/default.pdf /var/www/bigbluebutton-default/default.pdf
 
-
-
-sed -i "s/Welcome to/Bienvenido a/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties 
-#For help on using BigBlueButton see these
-sed -i "s/For help on using BigBlueButton see these/Para obtener ayuda sobre el uso de BigBlueButton, puede consultar/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-#To join the audio bridge click the speaker button
-sed -i "s/To join the audio bridge click the speaker button/Para unirse al puente de audio, haga clic en el bot&oacute;n del altavoz/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.p
-#Use a headset to avoid causing background noise for others
-sed -i "s/Use a headset to avoid causing background noise for others/Use un auricular para evitar causar ruido de fondo a los dem&aacute;s/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebu>
-#This server is running
-sed -i "s/This server is running/Este servidor esta activo/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-
-#########################################
-## CAMBIA PARAMETROS DEL VIDEO RB
-cp /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb.old
-cp /home/azureuser/bigbluebutton/video.rb   /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb
-#####
-
 ####CAMBIANDO BBB-PROPERTIES  SETTINGS
 
 sed -i "s/Welcome to/Bienvenido a/g"  /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties 
@@ -100,7 +82,7 @@ mkdir -p /mnt/scalelite-recordings
 echo "10.9.2.27:/mnt/scalelite-recordings     /mnt/scalelite-recordings        nfs     auto,nofail,noatime,nolock,intr,tcp,actimeo=1800        0       0" >> /etc/fstab
 mount -a
 
-
+/var/lib/tomcat9/logs
 ####EN CASO DE MIGRAR DATADRIVE
 #MONTAR EL DISCO EN /datadrive/bigbluebutton
 cp -r /var/bigbluebutton /var/bigbluebutton2
@@ -127,18 +109,21 @@ echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/r
 
 #/usr/local/bigbluebutton/core/
 
-mv /usr/local/bigbluebutton/core/Gemfile.lock  /usr/local/bigbluebutton/core/Gemfile.lock.old
+#mv /usr/local/bigbluebutton/core/Gemfile.lock  /usr/local/bigbluebutton/core/Gemfile.lock.old
+#addgroup scalelite-spool
 #rm a esrte archivo Gemfile.lock.old
-bbb-conf --clean
-sudo gem install conection_pool
+#bbb-conf --clean
+#sudo gem install conection_pool
 #Instalar las gemas que faltan
-apt install ruby2.7-dev libsystemd-dev -y 
-gem install redis builder nokogiri loofah open4 absolute_time journald-logger -y 
-gem update --default -y
-gem update fileutils --default 
+#apt install ruby2.7-dev libsystemd-dev -y 
+#gem install redis builder nokogiri loofah open4 absolute_time journald-logger 
+#gem update --default 
+#gem update fileutils --default 
 
 
+#mkdir -p /var/lib/tomcat9/logs
+#mv /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec.old
+#gem uninstall reline -v 0.1.2
+#apt-get purge bbb-demo -y
 
-mv /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec.old
-gem uninstall reline -v 0.1.2
-apt-get purge bbb-demo -y
+#bbb-conf --restart
