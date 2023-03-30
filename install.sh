@@ -145,6 +145,21 @@ hostname="`hostname`.eastus.cloudapp.azure.com"
 mkdir /root/bbb-exporter
 secret=$(bbb-conf --secret | awk '/Secret/ {print $2}')
 ###################################################
+echo "version: '3'
+services:
+  bbb-exporter:
+    container_name: 'bbb-exporter'
+    image: greenstatic/bigbluebutton-exporter:v0.6.1
+    ports:
+      - '127.0.0.1:9688:9688'
+    volumes:
+      - '/var/bigbluebutton:/var/bigbluebutton:ro'
+    environment:
+      RECORDINGS_METRICS_READ_FROM_DISK: 'true'
+    env_file:
+      - secrets.env
+    restart: unless-stopped" >> /root/bbb-exporter/docker-compose.yaml
+###################################
 echo "API_BASE_URL=https://$hostname/bigbluebutton/api/" >> /root/bbb-exporter/secrets.env
 echo "API_SECRET=$secret" >> /root/bbb-exporter/secrets.env
 cd /root/bbb-exporter
