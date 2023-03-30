@@ -87,7 +87,7 @@ mkdir -p /var/lib/tomcat9/logs
 #MONTAR EL DISCO EN /datadrive/bigbluebutton
 cp -r /var/bigbluebutton /var/bigbluebutton2
 mv /var/bigbluebutton /datadrive/
-
+_crontab
 sudo ln -s /datadrive/bigbluebutton/ /var/
 chown -h bigbluebutton:bigbluebutton /var/bigbluebutton
 chown  -R -h bigbluebutton:bigbluebutton  /datadrive/bigbluebutton
@@ -97,14 +97,14 @@ mkdir -p /ansible/logs/
 # Crontab -e
 #!/bin/bash
 
-# Add reboot commands to crontab
-echo "@reboot bbb-conf --restart >> /var/log/bbbrestart.log" | sudo tee -a /etc/crontab > /dev/null
-echo "@reboot mkdir -p /mnt/scalelite-recordings" | sudo tee -a /etc/crontab > /dev/null
-echo "@reboot mount -a" | sudo tee -a /etc/crontab > /dev/null
+echo "@reboot bbb-conf --restart >> /var/log/bbbrestart.log" > /home/azureuser/temp_crontab
+echo "@reboot mkdir -p /mnt/scalelite-recordings" >> /home/azureuser/temp_crontab
+echo "@reboot mount -a" >> /home/azureuser/temp_crontab
+echo "0 7 * * * /bin/bash /home/azureuser/scalelite_batch_import.sh" >> /home/azureuser/temp_crontab
+echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/recoveryRercordingsJobV2.log" >> /home/azureuser/temp_crontab
 
-# Add scheduled jobs to crontab
-echo "0 7 * * * /bin/bash /home/azureuser/scalelite_batch_import.sh" | sudo tee -a /etc/crontab > /dev/null
-echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/recoveryRercordingsJobV2.log" | sudo tee -a /etc/crontab > /dev/null
+crontab /home/azureuser/temp_crontab
+
 
 
 #/usr/local/bigbluebutton/core/
@@ -122,9 +122,6 @@ gem update --default
 gem update fileutils --default 
 
 
-#mkdir -p /var/lib/tomcat9/logs
-#mv /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec.old
-#gem uninstall reline -v 0.1.2
 apt-get purge bbb-demo -y
 bbb-conf --restart
 
@@ -137,4 +134,54 @@ gem install redis builder nokogiri loofah open4 absolute_time journald-logger
 gem update redis-namespace
 gem update redis
 
-reboot
+# +-+-+-+-+-+-+-+-+-+
+# |#|M|e|t|r|i|c|a|s|
+# +-+-+-+-+-+-+-+-+-+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+#Variblaes de  secret
+hostname="`hostname`.eastus.cloudapp.azure.com"
+mkdir /root/bbb-exporter
+secret=$(bbb-conf --secret | awk '/Secret/ {print $2}')
+###################################################
+echo "API_BASE_URL=https://$hostname/bigbluebutton/api/" >> /root/bbb-exporter/secrets.env
+echo "API_SECRET=$secret" >> /root/bbb-exporter/secrets.env
+cd /root/bbb-exporter
+sudo docker-compose up -d
+echo "Entra2020" | sudo htpasswd -c /etc/nginx/.htpasswd metrics
+
+
+###################3
+mkdir -p /etc/bigbluebutton/nginx/
+sudo sh -c 'echo "# BigBlueButton Exporter (metrics)
+location /metrics/ {
+    auth_basic \"BigBlueButton Exporter\";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://127.0.0.1:9688/;
+    include proxy_params;
+}" >> /etc/bigbluebutton/nginx/monitoring.nginx'
+
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+####
+# +-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+# |#|N|o|d|e| |E|x|p|o|r|t|e|r|
+# +-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+#!/bin/bash
+
+cd /root
+git clone https://github.com/greenstatic/bigbluebutton-exporter.git
+cp -r /root/bigbluebutton-exporter/extras/node_exporter /root/
+cd /root/node_exporter
+sudo docker-compose up -d
+
+sed -i '28i\location /node_exporter/ {\n    auth_basic "node_exporter";\n    auth_basic_user_file /etc/nginx/.htpasswd;\n    proxy_pass http://127.0.0.1:9100/;\n    include proxy_params;\n}' /etc/nginx/sites-available/bigbluebutton
+
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+echo "Finalizo"
