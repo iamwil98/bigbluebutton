@@ -54,7 +54,7 @@ sed -i "s/meetingExpireWhenLastUserLeftInMinutes=1/meetingExpireWhenLastUserLeft
 
 sed -i "s/userActivitySignResponseDelayInMinutes=5/userActivitySignResponseDelayInMinutes=250/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 
-sed -i "s/meetingCameraCap=0/meetingCameraCap=15/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i "s/meetingCameraCap=0/meetingCameraCap=8/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 ##########CAMBIANDO WEBM TO MP4
 sed -i "s/webm/mp4/g" /usr/local/bigbluebutton/core/scripts/presentation.yml
 
