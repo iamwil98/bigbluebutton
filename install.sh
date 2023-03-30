@@ -110,21 +110,31 @@ echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/r
 #/usr/local/bigbluebutton/core/
 
 #mv /usr/local/bigbluebutton/core/Gemfile.lock  /usr/local/bigbluebutton/core/Gemfile.lock.old
-#addgroup scalelite-spool
+addgroup scalelite-spool
 #adduser bigbluebutton
 #rm a esrte archivo Gemfile.lock.old
 #bbb-conf --clean
-#sudo gem install conection_pool
+sudo gem install conection_pool
 #Instalar las gemas que faltan
-#apt install ruby2.7-dev libsystemd-dev -y 
-#gem install redis builder nokogiri loofah open4 absolute_time journald-logger 
-#gem update --default 
-#gem update fileutils --default 
+apt install ruby2.7-dev libsystemd-dev -y 
+gem install redis builder nokogiri loofah open4 absolute_time journald-logger 
+gem update --default 
+gem update fileutils --default 
 
 
 #mkdir -p /var/lib/tomcat9/logs
 #mv /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec /usr/lib/ruby/gems/2.7.0/specifications/default/reline-0.1.2.gemspec.old
 #gem uninstall reline -v 0.1.2
-#apt-get purge bbb-demo -y
+apt-get purge bbb-demo -y
+bbb-conf --restart
 
-#bbb-conf --restart
+mkdir -p /home/bigbluebutton
+chmod 777 /home/bigbluebutton/
+
+apt install ruby2.7-dev libsystemd-dev
+gem install redis builder nokogiri loofah open4 absolute_time journald-logger
+
+gem update redis-namespace
+gem update redis
+
+reboot
