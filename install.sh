@@ -86,11 +86,20 @@ mkdir -p /var/lib/tomcat9/logs
 ####EN CASO DE MIGRAR DATADRIVE
 #MONTAR EL DISCO EN /datadrive/bigbluebutton
 cp -r /var/bigbluebutton /var/bigbluebutton2
+cp -r /var/freeswitch /var/freeswitch2
 mv /var/bigbluebutton /datadrive/
-_crontab
+mv /var/freeswitch /datadrive/
+
+#_crontab
 sudo ln -s /datadrive/bigbluebutton/ /var/
 chown -h bigbluebutton:bigbluebutton /var/bigbluebutton
 chown  -R -h bigbluebutton:bigbluebutton  /datadrive/bigbluebutton
+####################################
+sudo ln -s /datadrive/freeswitch/ /var/
+chown -h bigbluebutton:bigbluebutton /var/freeswitch
+chown  -R -h bigbluebutton:bigbluebutton  /datadrive/freeswitch
+
+
 #AGREGAR MANUAL AL CROtab -e
 mkdir -p /ansible/logs/
 
@@ -104,7 +113,45 @@ echo "0 7 * * * /bin/bash /home/azureuser/scalelite_batch_import.sh" >> /home/az
 echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/recoveryRercordingsJobV2.log" >> /home/azureuser/temp_crontab
 
 crontab /home/azureuser/temp_crontab
+###################################LIMITES
+sudo sh -c 'echo "
+vm.overcommit_memory = 1
+fs.file-max = 2097152
+kernel.shmmni=32000
+net.ipv4.ip_local_port_range = 4000 65500
+net.netfilter.nf_conntrack_max=1048576
+net.core.somaxconn = 65535
+net.core.message_cost = 10
+net.core.message_burst = 20
+net.ipv4.tcp_syncookies = 0
+net.core.rmem_default = 31457280
+net.core.rmem_max = 12582912
+net.core.wmem_default = 31457280
+net.core.wmem_max = 12582912
+net.core.optmem_max = 25165824
+net.ipv4.tcp_rmem = 8192 87380 16777216
+net.ipv4.udp_rmem_min = 16384
+net.ipv4.tcp_keepalive_time = 600
+net.ipv4.tcp_max_syn_backlog = 4096
+#net.core.somaxconn = 4096
+#calculo 200g  
+kernel.shmmni=32000
+#kernel.msgmni=204800
+kernel.msgmax=65536
+kernel.msgmnb=65536" >> /etc/sysctl.conf'
 
+
+####################################SYSTEMCTL
+sudo sh -c 'echo "
+root soft nproc 130000
+root hard nproc 130000
+root soft nofile 130000
+root hard nofile 130000
+* soft nofile 1048576
+* hard nofile 1048576
+* * nofile 130000" >> /etc/security/limits.conf'
+
+###########################################
 
 
 #/usr/local/bigbluebutton/core/
