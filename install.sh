@@ -47,8 +47,18 @@ cp /home/azureuser/bigbluebutton/video.rb   /usr/local/bigbluebutton/core/lib/re
 sed -i "s/defaultMeetingDuration=0/defaultMeetingDuration=240/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 
 sed -i "s/clientLogoutTimerInMinutes=0/clientLogoutTimerInMinutes=240/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-
+#####################################################################3
 sed -i "s/meetingExpireIfNoUserJoinedInMinutes=5/meetingExpireIfNoUserJoinedInMinutes=30/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i "s/defaultMaxUsers=0/defaultMaxUsers=200/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i "s/userActivitySignResponseDelayInMinutes=250/userActivitySignResponseDelayInMinutes=15/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i "s/muteOnStart=false/muteOnStart=true/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i "s/allowModsToEjectCameras=false/allowModsToEjectCameras=true/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i "s/defaultKeepEvents=false/defaultKeepEvents=true/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+
+allowModsToEjectCameras=false
+
+############################################################################################
+sed -i "s/userInactivityInspectTimerInMinutes=0/userInactivityInspectTimerInMinutes=120/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 
 sed -i "s/meetingExpireWhenLastUserLeftInMinutes=1/meetingExpireWhenLastUserLeftInMinutes=15/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 
@@ -57,6 +67,9 @@ sed -i "s/userActivitySignResponseDelayInMinutes=5/userActivitySignResponseDelay
 sed -i "s/meetingCameraCap=0/meetingCameraCap=8/g" /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 ##########CAMBIANDO WEBM TO MP4
 sed -i "s/webm/mp4/g" /usr/local/bigbluebutton/core/scripts/presentation.yml
+
+
+
 
 
 ####CARPETA PARA SCRIPTS
