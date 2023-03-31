@@ -34,17 +34,6 @@ module BigBlueButton
     # raw_archive_dir already contains meeting_id
     events = Nokogiri::XML(File.open("#{raw_archive_dir}/events.xml"))
 
-      #Numero de procesadores dependiendo del horario
-
-    d = DateTime.now
-    hourV=d.strftime("%H")
-
-    if hourV.to_i > 4 and hourV.to_i < 12
-        processorsV=7
-    else
-        processorsV=2
-    end
- 
     # Process user video (camera)
     start_time = BigBlueButton::Events.first_event_timestamp(events)
     end_time = BigBlueButton::Events.last_event_timestamp(events)
@@ -61,6 +50,26 @@ module BigBlueButton
     user_video_file = BigBlueButton::EDL::Video.render(
       user_video_edl, user_video_layout, "#{target_dir}/webcams")
 
+   
+ #Numero de procesadores dependiendo del horario
+
+    d = DateTime.now
+    hourV=d.strftime("%H")
+
+
+   #entre las 12AM Y 6 am full capacidad cpus
+    if hourV.to_i > 4 and hourV.to_i < 12
+        processorsV=7
+   #entre las 6pm Y 9pm 1 solo CPU RUSH HOUR
+    elsif  hourV.to_i > 22 and hourV.to_i <= 3
+        processorsV=1
+   #entre las 7AM Y 5 pm 2 cpus
+    else
+        processorsV=2
+    end
+
+
+
     formats = [
       {
         extension: 'webm',
@@ -68,13 +77,9 @@ module BigBlueButton
           # These settings are appropriate for 640x480 medium quality, and should be tweaked for other resolutions
           # See https://developers.google.com/media/vp9/settings/vod/
           # We use force_key_frames instead of -g to set the GOP size independent of the frame rate
-#          %w[-c:v libvpx-vp9 -crf 32 -deadline realtime -cpu-used 8 -force_key_frames expr:gte(t,n_forced*10) -tile-columns 2 -tile-rows 2 -threads 4
-#             -c:a copy
-#             -f webm]
-           %w[-c:v libvpx-vp9 -b:v 750K -minrate 375K -maxrate 1088K -crf 33 -quality realtime -speed 5 -tile-columns 4 -threads 4
-              -c:a libopus -b:a 48K
-              -f webm]
-
+          %w[-c:v libvpx-vp9 -crf 32 -deadline realtime -cpu-used 4 -force_key_frames expr:gte(t,n_forced*10) -tile-columns 2 -tile-rows 2 -threads 4
+             -c:a copy
+             -f webm]
           # Google recommends doing a 2-pass encode for better quality, but it's a lot slower. If you want to do this,
           # comment the lines above, and uncomment the lines below.
           #%w[-c:v libvpx-vp9 -b:v 750K -minrate 375K -maxrate 1088K -crf 33 -quality good -speed 4 -g 240 -tile-columns 1 -threads 2
@@ -93,12 +98,14 @@ module BigBlueButton
           # Increase -threads (or remove it, to use all cpu cores) to speed up processing
           # You can also change the preset: try 'fast' or 'faster'
           # To change quality, adjust the -crf value. Lower numbers are higher quality.
-         # %w[-c:v copy
-         #    -c:a aac -b:a 64K
-         #    -f mp4 -movflags faststart]
-           %W[-c:v libx264 -crf 23 -preset faster -g 240 -quality realtime -speed 5 -tile-columns 2 -threads #{processorsV}
+          #%w[-c:v copy
+          #   -c:a aac -b:a 64K
+          #   -f mp4 -movflags faststart]
+
+          %W[-c:v libx264 -crf 23 -preset faster -g 240 -quality realtime -speed 5 -tile-columns 2 -threads #{processorsV}
               -c:a aac -b:a 64K
               -f mp4 -movflags faststart]
+
         ],
         postprocess: [ ]
       }
@@ -135,13 +142,19 @@ module BigBlueButton
     deskshare_video_file = BigBlueButton::EDL::Video.render(
       deskshare_video_edl, deskshare_layout, "#{target_dir}/deskshare")
 
- #Numero de procesadores dependiendo del horario
+    #Numero de procesadores dependiendo del horario
 
     d = DateTime.now
     hourV=d.strftime("%H")
 
+
+   #entre las 12AM Y 6 am full capacidad cpus
     if hourV.to_i > 4 and hourV.to_i < 12
         processorsV=7
+   #entre las 6pm Y 9pm 1 solo CPU RUSH HOUR
+    elsif  hourV.to_i > 22 and hourV.to_i <= 3
+        processorsV=1
+   #entre las 7AM Y 5 pm 2 cpus
     else
         processorsV=2
     end
@@ -155,13 +168,16 @@ module BigBlueButton
           # These settings are appropriate for 1280x720 medium quality, and should be tweaked for other resolutions
           # See https://developers.google.com/media/vp9/settings/vod/
           # We use force_key_frames instead of -g to set the GOP size independent of the frame rate
-#          %w[-c:v libvpx-vp9 -crf 32 -deadline realtime -cpu-used 8 -force_key_frames expr:gte(t,n_forced*10) -tile-columns 2 -tile-rows 2 -threads 4
-#             -c:a copy
-#             -f webm]
-
-            %w[-c:v libvpx-vp9 -b:v 750K -minrate 375K -maxrate 1088K -crf 33 -quality realtime -speed 5 -tile-columns 2 -threads 4
-             -c:a libopus -b:a 48K
+          %w[-c:v libvpx-vp9 -crf 32 -deadline realtime -cpu-used processorsV -force_key_frames expr:gte(t,n_forced*10) -tile-columns 2 -tile-rows 2 -threads 4
+             -c:a copy
              -f webm]
+
+          #%w[-c:v libx264 -crf 23 -preset faster -g 240 -quality realtime -speed 5 -tile-columns 2 -threads #{processorsV}
+          #   -c:a aac -b:a 64K
+          #   -f mp4 -movflags faststart]
+
+
+
           # Google recommends doing a 2-pass encode for better quality, but it's a lot slower. If you want to do this,
           # comment the lines above, and uncomment the lines below.
           #%w[-c:v libvpx-vp9 -b:v 1024K -minrate 512K -maxrate 1485K -crf 32 -quality good -speed 4 -g 240 -tile-columns 2 -threads 2
@@ -180,12 +196,14 @@ module BigBlueButton
           # Increase -threads (or remove it, to use all cpu cores) to speed up processing
           # You can also change the preset: try 'fast' or 'faster'
           # To change quality, adjust the -crf value. Lower numbers are higher quality.
-         # %w[-c:v copy
-         #    -c:a aac -b:a 64K
-         #    -f mp4 -movflags faststart]
+          #%w[-c:v copy
+          #   -c:a aac -b:a 64K
+          #   -f mp4 -movflags faststart]
+
           %W[-c:v libx264 -crf 23 -preset faster -g 240 -quality realtime -speed 5 -tile-columns 2 -threads #{processorsV}
-             -c:a aac -b:a 64K
-             -f mp4 -movflags faststart]
+              -c:a aac -b:a 64K
+              -f mp4 -movflags faststart]
+
         ],
         postprocess: [ ]
       }

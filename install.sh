@@ -96,8 +96,9 @@ chown -h bigbluebutton:bigbluebutton /var/bigbluebutton
 chown  -R -h bigbluebutton:bigbluebutton  /datadrive/bigbluebutton
 ####################################
 sudo ln -s /datadrive/freeswitch/ /var/
-chown -h bigbluebutton:bigbluebutton /var/freeswitch
-chown  -R -h bigbluebutton:bigbluebutton  /datadrive/freeswitch
+chown -h freeswitch:freeswitch /var/freeswitch
+chown  -R -h freeswitch:freeswitch  /datadrive/freeswitch
+chown freeswitch:freeswitch /datadrive/freeswitch/meetings/
 
 
 #AGREGAR MANUAL AL CROtab -e
