@@ -151,9 +151,17 @@ root hard nofile 130000
 * hard nofile 1048576
 * * nofile 130000" >> /etc/security/limits.conf'
 
-###########################################
+###########################################PERFORMANCE
+sed -i "s/limit_conn ws_zone 3/limit_conn ws_zone 6/g" /usr/share/bigbluebutton/nginx/bbb-html5.nginx
+echo "Default = 1; Min = 1; Max = 4" >> /usr/share/meteor/bundle/bbb-html5-with-roles.conf
+sed -i "s/NUMBER_OF_BACKEND_NODEJS_PROCESSES=2/NUMBER_OF_BACKEND_NODEJS_PROCESSES=4/g" /usr/share/meteor/bundle/bbb-html5-with-roles.
+sed -i "s/NUMBER_OF_FRONTEND_NODEJS_PROCESSES=2/NUMBER_OF_FRONTEND_NODEJS_PROCESSES=8/g" /usr/share/meteor/bundle/bbb-html5-with-roles.conf
+sed -i "s/--max_semi_space_size=128/--max_semi_space_size=2048/g" /usr/share/meteor/bundle/systemd_start.sh
+sed -i "s/worker_rlimit_nofile 10000/worker_rlimit_nofile 65000/g" /etc/nginx/nginx.conf
+sed -i "s/worker_connections 4000/worker_connections 8000/g" /etc/nginx/nginx.conf
 
 
+#################################################
 #/usr/local/bigbluebutton/core/
 
 #mv /usr/local/bigbluebutton/core/Gemfile.lock  /usr/local/bigbluebutton/core/Gemfile.lock.old
