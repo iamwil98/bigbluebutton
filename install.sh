@@ -8,7 +8,7 @@ sudo apt-get upgrade -y
 
 hostname="`hostname`.eastus.cloudapp.azure.com"
 
-wget -qO- https://ubuntu.bigbluebutton.org/bbb-install-2.5.sh | bash -s -- -v focal-250 -s $hostname -e wilmar.aguilar@territorio.com  -a -w
+wget -qO- https://ubuntu.bigbluebutton.org/bbb-install-2.5.sh | bash -s -- -v focal-250-2.5.14 -s $hostname -e wilmar.aguilar@territorio.com  -a -w
 
 #Modificando TLS en el VIRTUALHOST de Nginx
 
@@ -181,29 +181,29 @@ sed -i "s/worker_connections 4000/worker_connections 8000/g" /etc/nginx/nginx.co
 #/usr/local/bigbluebutton/core/
 
 #mv /usr/local/bigbluebutton/core/Gemfile.lock  /usr/local/bigbluebutton/core/Gemfile.lock.old
-#addgroup scalelite-spool
+addgroup scalelite-spool
 #adduser bigbluebutton
 #rm a esrte archivo Gemfile.lock.old
 #bbb-conf --clean
-#sudo gem install conection_pool
+sudo gem install conection_pool
 #Instalar las gemas que faltan
-#apt install ruby2.7-dev libsystemd-dev -y 
-#gem install redis builder nokogiri loofah open4 absolute_time journald-logger 
-#gem update --default 
-#gem update fileutils --default 
+apt install ruby2.7-dev libsystemd-dev -y 
+gem install redis builder nokogiri loofah open4 absolute_time journald-logger 
+gem update --default 
+gem update fileutils --default 
 
 
-#apt-get purge bbb-demo -y
-#bbb-conf --restart
+apt-get purge bbb-demo -y
+bbb-conf --restart
 
 mkdir -p /home/bigbluebutton
 chmod 777 /home/bigbluebutton/
 
-#apt install ruby2.7-dev libsystemd-dev
-#gem install redis builder nokogiri loofah open4 absolute_time journald-logger
+apt install ruby2.7-dev libsystemd-dev
+gem install redis builder nokogiri loofah open4 absolute_time journald-logger
 
-#gem update redis-namespace
-#gem update redis
+gem update redis-namespace
+gem update redis
 
 # +-+-+-+-+-+-+-+-+-+
 # |#|M|e|t|r|i|c|a|s|
