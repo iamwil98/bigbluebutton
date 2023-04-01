@@ -176,7 +176,7 @@ sed -i "s/--max_semi_space_size=128/--max_semi_space_size=2048/g" /usr/share/met
 sed -i "s/worker_rlimit_nofile 10000/worker_rlimit_nofile 65000/g" /etc/nginx/nginx.conf
 sed -i "s/worker_connections 4000/worker_connections 8000/g" /etc/nginx/nginx.conf
 
-sed -i "s/mount -t tmpfs -o size=512m tmpfs /mnt/mongo-ramdisk/mount -t tmpfs -o size=2048m tmpfs /mnt/mongo-ramdisk/g" /usr/share/meteor/bundle/mongod_start_pre.sh
+sed -i "s/size=512m/size=2048m/g" /usr/share/meteor/bundle/mongod_start_pre.sh
 ##########################MEMORIA
 sudo fallocate -l 8G /datadrive/swapfile
 sudo chmod 600 /datadrive/swapfile
