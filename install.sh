@@ -8,7 +8,7 @@ sudo apt-get upgrade -y
 
 hostname="`hostname`.eastus.cloudapp.azure.com"
 
-wget -qO- https://ubuntu.bigbluebutton.org/bbb-install-2.5.sh | bash -s -- -v focal-250-2.5.14 -s $hostname -e wilmar.aguilar@territorio.com  -a -w
+wget -qO- https://ubuntu.bigbluebutton.org/bbb-install-2.5.sh | bash -s -- -v focal-250 -s $hostname -e wilmar.aguilar@territorio.com  -a -w
 
 #Modificando TLS en el VIRTUALHOST de Nginx
 
@@ -176,6 +176,16 @@ sed -i "s/--max_semi_space_size=128/--max_semi_space_size=2048/g" /usr/share/met
 sed -i "s/worker_rlimit_nofile 10000/worker_rlimit_nofile 65000/g" /etc/nginx/nginx.conf
 sed -i "s/worker_connections 4000/worker_connections 8000/g" /etc/nginx/nginx.conf
 
+sed -i "s/mount -t tmpfs -o size=512m tmpfs /mnt/mongo-ramdisk/mount -t tmpfs -o size=2048m tmpfs /mnt/mongo-ramdisk/g" /usr/share/meteor/bundle/mongod_start_pre.sh
+##########################MEMORIA
+sudo fallocate -l 8G /datadrive/swapfile
+sudo chmod 600 /datadrive/swapfile
+sudo mkswap /datadrive/swapfile
+sudo swapon /datadrive/swapfile
+echo "/datadrive/swapfile none swap sw 0 0" >> /etc/fstab
+
+
+################################
 
 #################################################
 #/usr/local/bigbluebutton/core/
