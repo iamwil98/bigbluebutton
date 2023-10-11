@@ -12,17 +12,10 @@ wget -qO- https://ubuntu.bigbluebutton.org/bbb-install-2.5.sh | bash -s -- -v fo
 
 #Modificando TLS en el VIRTUALHOST de Nginx
 
-sed -i "s/ssl_protocols TLSv1.2 TLSv1.3/ssl_protocols TLSv1.2/g" /etc/nginx/sites-available/bigbluebutton
-echo "iniciando Servicio Nginx"
-
-/etc/init.d/nginx start
-echo "###Reiniciar BBB"
-
-bbb-conf --restart
 
 ###################Opciones PRESENTACION E IDIOMA####
 ##Cambiar la presentation
-cp /home/azureuser/bigbluebutton/default.pdf /var/www/bigbluebutton-default/default.pdf
+#cp /home/azureuser/bigbluebutton/default.pdf /var/www/bigbluebutton-default/default.pdf
 
 ####CAMBIANDO BBB-PROPERTIES  SETTINGS
 
@@ -79,8 +72,8 @@ sed -i "s/webm/mp4/g" /usr/local/bigbluebutton/core/scripts/presentation.yml
 
 sudo mkdir /ansible/
 chmod 777 /ansible/
-cp /home/azureuser/bigbluebutton/recoveryRecordingsJobV2.sh /ansible/
-chmod 777 /ansible/recoveryRecordingsJobV2.sh
+cp /home/azureuser/bigbluebutton/recoveryRecordingsJobV3.sh /ansible/
+chmod 777 /ansible/recoveryRecordingsJobV3.sh
 
 ######Archivos Para scalelite
 
@@ -88,17 +81,17 @@ cp /home/azureuser/bigbluebutton/scalelite.yml  /usr/local/bigbluebutton/core/sc
 
 cp /home/azureuser/bigbluebutton/scalelite_post_publish.rb /usr/local/bigbluebutton/core/scripts/post_publish/
 
-cp /home/azureuser/bigbluebutton/scalelite_batch_import.sh  /home/azureuser
-chmod 777 /home/azureuser/bigbluebutton/scalelite_batch_import.sh
-chmod 777 /home/azureuser/scalelite_batch_import.sh
+cp /home/azureuser/bigbluebutton/scalelite_batch_importv3.sh  /home/azureuser
+chmod 777 /home/azureuser/bigbluebutton/scalelite_batch_importv3.sh
+chmod 777 /home/azureuser/scalelite_batch_importv3.sh
 ####MONTAR NFS
 apt-get install nfs-common -y
 
 mkdir -p /mnt/scalelite-recordings
-echo "10.9.2.27:/mnt/scalelite-recordings     /mnt/scalelite-recordings        nfs     auto,nofail,noatime,nolock,intr,tcp,actimeo=1800        0       0" >> /etc/fstab
+echo "10.9.2.4:/mnt/scalelite-recordings     /mnt/scalelite-recordings        nfs     auto,nofail,noatime,nolock,intr,tcp,actimeo=1800        0       0" >> /etc/fstab
 mount -a
 
-mkdir -p /var/lib/tomcat9/logs
+#mkdir -p /var/lib/tomcat9/logs
 ####EN CASO DE MIGRAR DATADRIVE
 #MONTAR EL DISCO EN /datadrive/bigbluebutton
 cp -r /var/bigbluebutton /var/bigbluebutton2
@@ -116,7 +109,9 @@ chown -h freeswitch:freeswitch /var/freeswitch
 chown  -R -h freeswitch:freeswitch  /datadrive/freeswitch
 chown freeswitch:freeswitch /datadrive/freeswitch/meetings/
 
-
+mkdir -p /scripts/
+cp /home/azureuser/bigbluebutton/cleanPublishedRecords.sh /scripts
+chmod 777 /scripts/cleanPublishedRecords.sh
 #AGREGAR MANUAL AL CROtab -e
 mkdir -p /ansible/logs/
 
@@ -126,9 +121,9 @@ mkdir -p /ansible/logs/
 echo "@reboot bbb-conf --restart >> /var/log/bbbrestart.log" > /home/azureuser/temp_crontab
 echo "@reboot mkdir -p /mnt/scalelite-recordings" >> /home/azureuser/temp_crontab
 echo "@reboot mount -a" >> /home/azureuser/temp_crontab
-echo "0 7 * * * /bin/bash /home/azureuser/scalelite_batch_import.sh" >> /home/azureuser/temp_crontab
-echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV2.sh >> /ansible/logs/recoveryRercordingsJobV2.log" >> /home/azureuser/temp_crontab
-
+echo "0 7 * * * /bin/bash /home/azureuser/scalelite_batch_importv3.sh" >> /home/azureuser/temp_crontab
+echo "0 9 * * * /bin/bash /ansible/recoveryRecordingsJobV3.sh >> /ansible/logs/recoveryRercordingsJobV3.log" >> /home/azureuser/temp_crontab
+echo "0 7 * * * /bin/bash /scripts/cleanPublishedRecords.sh >> /scripts/logs/clenPublishedRecords.log 2>&1" >> /home/azureuser/temp_crontab
 crontab /home/azureuser/temp_crontab
 ###################################LIMITES
 sudo sh -c 'echo "
@@ -245,6 +240,7 @@ echo "API_BASE_URL=https://$hostname/bigbluebutton/api/" >> /root/bbb-exporter/s
 echo "API_SECRET=$secret" >> /root/bbb-exporter/secrets.env
 cd /root/bbb-exporter
 sudo docker-compose up -d
+apt install apache2-utils -y
 echo "Entra2020" | sudo htpasswd -c /etc/nginx/.htpasswd metrics
 
 
